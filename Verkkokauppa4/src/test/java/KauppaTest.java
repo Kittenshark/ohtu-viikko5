@@ -155,5 +155,22 @@ public class KauppaTest {
         k.tilimaksu("tunturi", "24680");
         verify(pankki).tilisiirto(anyString(), eq(3), anyString(), anyString(), anyInt());
     }
+    
+    @Test
+    public void poistettuTuoteEiPyyntoNakyy() {
+        when(viite.uusi()).thenReturn(42);
+        when(varasto.saldo(1)).thenReturn(10);
+        when(varasto.saldo(2)).thenReturn(10);
+        when(varasto.haeTuote(1)).thenReturn(new Tuote(1, "maito", 5));
+        when(varasto.haeTuote(2)).thenReturn(new Tuote(1, "kahvi", 6));
+        
+        k.aloitaAsiointi();
+        k.lisaaKoriin(1);
+        k.lisaaKoriin(2);
+        k.poistaKorista(1);
+        k.tilimaksu("pekka", "12345");
+        
+        verify(pankki).tilisiirto(eq("pekka"), anyInt(), eq("12345"), anyString(),eq(6));
+    }
 
 }
